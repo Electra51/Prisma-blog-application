@@ -47,6 +47,8 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+
+    autoSignInAfterVerification: true, // auto signin after verification
     sendVerificationEmail: async ({ user, url, token }, request) => {
       console.log({ user, url, token });
 
@@ -183,6 +185,15 @@ If you didn't create an account, you can ignore this email.
       } catch (err) {
         console.error("error", err);
       }
+    },
+  },
+
+  socialProviders: {
+    google: {
+      promt: "select_account consent", // many gmail thakle akta select korar way
+      accessType: "offline", //always refresh token chaile
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
 });
