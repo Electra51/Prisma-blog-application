@@ -3,6 +3,7 @@ import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { postService } from "./post.service";
 
+//create post
 const createPost = async (req: Request, res: Response) => {
   console.log("user", req.user);
 
@@ -23,6 +24,7 @@ const createPost = async (req: Request, res: Response) => {
   }
 };
 
+//get all posts
 const getAllPost = async (req: Request, res: Response) => {
   try {
     const { search } = req.query;
@@ -73,7 +75,26 @@ const getAllPost = async (req: Request, res: Response) => {
   }
 };
 
+//get post by id
+const getPostById = async (req: Request, res: Response) => {
+  try {
+    const { postId } = req.params;
+    if (!postId) {
+      throw new Error("Post id is required!");
+    }
+    const result = await postService.getPostById(postId as string); //service a jacche
+    res.status(201).json(result);
+  } catch (err) {
+    console.error("Post fetch failed:", err);
+
+    return res.status(400).json({
+      error: "Post fetch failed",
+    });
+  }
+};
+
 export const PostController = {
   createPost,
   getAllPost,
+  getPostById,
 };
