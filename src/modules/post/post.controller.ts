@@ -82,7 +82,7 @@ const getPostById = async (req: Request, res: Response) => {
     if (!postId) {
       throw new Error("Post id is required!");
     }
-    const result = await postService.getPostById(postId as string);
+    const result = await postService.getPostById(postId as string); //service a jacche
     res.status(201).json(result);
   } catch (err) {
     console.error("Post fetch failed:", err);
