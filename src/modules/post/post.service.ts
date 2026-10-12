@@ -2,6 +2,7 @@ import { Post, PostStatus } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
+//create post
 const createPost = async (
   data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">,
   userId: string,
@@ -15,6 +16,7 @@ const createPost = async (
   return result;
 };
 
+//get all posts
 const getAllPost = async ({
   search,
   tags,
@@ -118,7 +120,31 @@ const getAllPost = async ({
   };
 };
 
+//get post by id
+const getPostById = async (postId: string) => {
+  return await prisma.$transaction(async (tx) => {
+    await tx.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        views: {
+          increment: 1,
+        },
+      },
+    });
+    const postData = await tx.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    return postData;
+  });
+};
+
 export const postService = {
   createPost,
   getAllPost,
+  getPostById,
 };
