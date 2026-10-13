@@ -62,9 +62,34 @@ const getCommentByAuthorId = async (authorId: string) => {
     },
   });
 };
+//comment delete
+//nijr comment delete korte parbe
+//login thakte hobe
+//nijer comment ki na check korte hobe
+const deleteComment = async (commentId: string, authorId: string) => {
+  const commentData = await prisma.comment.findFirst({
+    where: {
+      id: commentId,
+      authorId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!commentData) {
+    throw new Error("Your provided input is invalid");
+  }
+  return await prisma.comment.delete({
+    where: {
+      id: commentData.id,
+    },
+  });
+};
 
 export const commentService = {
   createComment,
   getCommentById,
   getCommentByAuthorId,
+  deleteComment,
 };

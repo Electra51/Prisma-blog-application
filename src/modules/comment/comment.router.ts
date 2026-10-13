@@ -4,22 +4,20 @@ import { CommentController } from "./comment.controller";
 
 const router = express.Router();
 
-router.get(
-  "/author/:authorId",
-  auth(UserRole.USER, UserRole.ADMIN),
-  CommentController.getCommentByAuthorId,
-);
+router.get("/author/:authorId", CommentController.getCommentByAuthorId);
 
-router.get(
-  "/:commentId",
-  auth(UserRole.USER, UserRole.ADMIN),
-  CommentController.getCommentById,
-);
+router.get("/:commentId", CommentController.getCommentById);
 
 router.post(
   "/",
   auth(UserRole.USER, UserRole.ADMIN),
   CommentController.createComment,
+);
+
+router.delete(
+  "/:commentId",
+  auth(UserRole.USER, UserRole.ADMIN),
+  CommentController.deleteComment,
 );
 
 export const commentRouter: Router = router;
