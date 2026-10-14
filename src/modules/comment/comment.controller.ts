@@ -1,38 +1,44 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { commentService } from "./comment.service";
 
 //create post
-const createComment = async (req: Request, res: Response) => {
+const createComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     req.body.authorId = user?.id;
     const result = await commentService.createComment(req.body);
     res.status(201).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Comment creation failed",
-      details: err,
-    });
+    next(err);
   }
 };
 
 //getCommentById
-const getCommentById = async (req: Request, res: Response) => {
+const getCommentById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { commentId } = req.params;
 
     const result = await commentService.getCommentById(commentId as string);
     res.status(200).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Comment fetched failed",
-      details: err,
-    });
+    next(err);
   }
 };
 
 //getCommentby authorId
-const getCommentByAuthorId = async (req: Request, res: Response) => {
+const getCommentByAuthorId = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { authorId } = req.params;
     console.log("authorId", authorId);
@@ -41,14 +47,15 @@ const getCommentByAuthorId = async (req: Request, res: Response) => {
     );
     res.status(200).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Comment fetched failed",
-      details: err,
-    });
+    next(err);
   }
 };
 
-const deleteComment = async (req: Request, res: Response) => {
+const deleteComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     const { commentId } = req.params;
@@ -58,14 +65,16 @@ const deleteComment = async (req: Request, res: Response) => {
     );
     res.status(200).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Comment fetched failed",
-      details: err,
-    });
+    next(err);
   }
 };
+
 //update comment
-const updateComment = async (req: Request, res: Response) => {
+const updateComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     const { commentId } = req.params;
@@ -76,15 +85,16 @@ const updateComment = async (req: Request, res: Response) => {
     );
     res.status(200).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Comment fetched failed",
-      details: err,
-    });
+    next(err);
   }
 };
 
 //update comment
-const moderateComment = async (req: Request, res: Response) => {
+const moderateComment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { commentId } = req.params;
 
@@ -94,12 +104,7 @@ const moderateComment = async (req: Request, res: Response) => {
     );
     res.status(200).json(result);
   } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "Comment update failed";
-    res.status(400).json({
-      error: errorMessage,
-      details: err,
-    });
+    next(err);
   }
 };
 
