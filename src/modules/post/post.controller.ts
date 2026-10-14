@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
 import { UserRole } from "../../middlewares/auth";
 import { postService } from "./post.service";
 
 //create post
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response, next: NextFunction) => {
   console.log("user", req.user);
 
   try {
@@ -18,10 +18,7 @@ const createPost = async (req: Request, res: Response) => {
     const result = await postService.createPost(req.body, user.id as string);
     res.status(201).json(result);
   } catch (err) {
-    res.status(400).json({
-      error: "Post creation failed",
-      details: err,
-    });
+    next(err);
   }
 };
 
@@ -77,7 +74,7 @@ const getAllPost = async (req: Request, res: Response) => {
 };
 
 //get post by id
-const getPostById = async (req: Request, res: Response) => {
+const getPostById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { postId } = req.params;
     if (!postId) {
@@ -86,16 +83,12 @@ const getPostById = async (req: Request, res: Response) => {
     const result = await postService.getPostById(postId as string); //service a jacche
     res.status(201).json(result);
   } catch (err) {
-    console.error("Post fetch failed:", err);
-
-    return res.status(400).json({
-      error: "Post fetch failed",
-    });
+    next(err);
   }
 };
 
 //get post by id
-const getMyPosts = async (req: Request, res: Response) => {
+const getMyPosts = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = req.user;
     if (!user) {
@@ -104,16 +97,16 @@ const getMyPosts = async (req: Request, res: Response) => {
     const result = await postService.getMyPosts(user?.id as string); //service a jacche
     res.status(201).json(result);
   } catch (err) {
-    console.error("Post fetch failed:", err);
-
-    return res.status(400).json({
-      error: "Post fetch failed",
-    });
+    next(err);
   }
 };
 
 //update my post
-const updateMyPost = async (req: Request, res: Response) => {
+const updateMyPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const user = req.user;
     if (!user) {
@@ -131,12 +124,7 @@ const updateMyPost = async (req: Request, res: Response) => {
     ); //service a jacche
     res.status(201).json(result);
   } catch (err) {
-    const errorMessage =
-      err instanceof Error ? err.message : "my post update failed";
-    res.status(400).json({
-      error: errorMessage,
-      details: err,
-    });
+    next(err);
   }
 };
 
