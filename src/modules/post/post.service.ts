@@ -287,6 +287,53 @@ const deleteMyPost = async (
   });
 };
 
+const getStats = async () => {
+  //post count
+  //total public post,
+  //total drafts,
+  //total comments, views
+  //multiple query houyay transaction use korbo
+
+  return await prisma.$transaction(async (tx) => {
+    const [
+      totalPosts,
+      publishedPosts,
+      draftPosts,
+      archivedPosts,
+      totalComments,
+      approvedComments,
+      totalUsers,
+      adminCount,
+      userCount,
+      totalViews,
+    ] = await Promise.all([
+      await tx.post.count(),
+      await tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
+      await tx.post.count({ where: { status: PostStatus.DRAFT } }),
+      await tx.post.count({ where: { status: PostStatus.ARCHIVED } }),
+      await tx.comment.count(),
+      await tx.comment.count({ where: { status: CommentStatus.APPROVED } }),
+      await tx.user.count(),
+      await tx.user.count({ where: { role: "ADMIN" } }),
+      await tx.user.count({ where: { role: "USER" } }),
+      await tx.post.aggregate({ _sum: { views: true } }),
+    ]);
+
+    return {
+      totalPosts,
+      publishedPosts,
+      draftPosts,
+      archivedPosts,
+      totalComments,
+      approvedComments,
+      totalUsers,
+      adminCount,
+      userCount,
+      totalViews: totalViews._sum.views,
+    };
+  });
+};
+
 export const postService = {
   createPost,
   getAllPost,
@@ -294,4 +341,5 @@ export const postService = {
   getMyPosts,
   updateMyPost,
   deleteMyPost,
+  getStats,
 };
